@@ -1,0 +1,1 @@
+# Get-IntuneMIWin32Logs
