@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.15
+.VERSION 1.16
 
 .GUID 0f5a4a8f-a301-4933-9b08-da09bc38b401
 
@@ -64,7 +64,12 @@ Function ShowCMLog ($sLine) {
     $oLog | Add-Member -type NoteProperty -name Message -value  $body
     $oLog = $oLog | Sort-Object 'DateTime'
     if ($reline.count -gt 0 ) {
-        "$($oLog.DateTime) $($oLog.Message)"
+        if ($oLog.Message -ilike "exception") {
+            write-host -Foreground Yellow "$($oLog.DateTime) $($oLog.Message)"
+        }
+        else {
+            write-host  "$($oLog.DateTime) $($oLog.Message)"
+        }
     }
 }
 Function ShowFilteredContent {
