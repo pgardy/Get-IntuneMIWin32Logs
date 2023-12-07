@@ -1,7 +1,7 @@
 
 <#PSScriptInfo
 
-.VERSION 1.16
+.VERSION 1.19
 
 .GUID 0f5a4a8f-a301-4933-9b08-da09bc38b401
 
@@ -64,12 +64,7 @@ Function ShowCMLog ($sLine) {
     $oLog | Add-Member -type NoteProperty -name Message -value  $body
     $oLog = $oLog | Sort-Object 'DateTime'
     if ($reline.count -gt 0 ) {
-        if ($oLog.Message -ilike "exception") {
-            write-host -Foreground Yellow "$($oLog.DateTime) $($oLog.Message)"
-        }
-        else {
-            write-host  "$($oLog.DateTime) $($oLog.Message)"
-        }
+        $oLog
     }
 }
 Function ShowFilteredContent {
@@ -80,9 +75,20 @@ Function ShowFilteredContent {
     $global:content = $global:content | Select-Object -last $LinesNumber
     $global:content3 = @()
     $global:content3 = Compare-Object -ReferenceObject $global:content -DifferenceObject $global:content2
+    $diff = $global:content3.InputObject #| Sort-Object
     #$content =( $content | Where-Object { $_ -like  } )
-    foreach ($line in ($global:content3.InputObject) ) {
-        ShowCMLog $line
+    $lines = @()
+    foreach ($line in ($diff) ) {
+        $lines += ShowCMLog $line
+    }
+    $lines = $lines | Sort-Object 'DateTime'
+    foreach ($oLog in $lines) {
+        if ($oLog.Message -ilike "*exception*") {
+            write-host -Foreground Yellow "$($oLog.DateTime) $($oLog.Message)"
+        }
+        else {
+            write-host "$($oLog.DateTime) $($oLog.Message)"
+        }
     }
     $global:content2 = $global:content
 }
